@@ -1,8 +1,5 @@
 {
   "name": "dinner-doodle",
   "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vercel dev"
-  }
+  "type": "module"
 }
