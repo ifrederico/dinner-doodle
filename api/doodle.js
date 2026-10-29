@@ -5,14 +5,14 @@ const MODEL = process.env.OPENAI_IMAGE_MODEL || "gpt-image-2";
 // The three tiles go from easiest to most fun to copy.
 const STYLES = {
   1: "super simple doodle with as few lines as possible, something a child could copy in 30 seconds",
-  2: "simple cartoon doodle with clean outlines and only a few details",
-  3: "cute cartoon doodle with a few playful details that is still easy to copy with a pen",
+  2: "simple doodle with just a few details, like a quick napkin sketch anyone could copy in a minute",
+  3: "fun cartoon doodle with one or two playful details, still easy to copy with a pen in two minutes",
 };
 
 function buildPrompt(subject, level) {
   return [
     `Draw ${subject} as a ${STYLES[level]}.`,
-    "Black ballpoint pen line art on plain white paper.",
+    "Black ballpoint pen line art on plain white paper, drawn quickly by hand. Not a coloring-book page.",
     "Clean single-weight outlines only: no shading, no gray, no color, no text, no background scenery.",
     "Center the whole subject with white space around it.",
   ].join(" ");
