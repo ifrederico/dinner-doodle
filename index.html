@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dinner Doodle</title>
+<meta name="description" content="Type a word, get three easy doodles to copy with a pen.">
+<meta name="theme-color" content="#fbf8f1">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Doodle">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fbf8f1;
+    --rule: #e3e8f2;
+    --ink: #1d2433;
+    --ink-soft: #626b7c;
+    --pen: #2648c7;
+    --red: #d2453a;
+    --card: #ffffff;
+    --sketch: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    --sketch-alt: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    min-height: 100dvh;
+    background-color: var(--paper);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 35px, var(--rule) 35px 36px);
+    color: var(--ink);
+    font-family: "Patrick Hand", "Comic Sans MS", system-ui, sans-serif;
+    font-size: 20px;
+    line-height: 1.3;
+    -webkit-tap-highlight-color: transparent;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding:
+      calc(env(safe-area-inset-top) + 24px)
+      calc(env(safe-area-inset-right) + 16px)
+      calc(env(safe-area-inset-bottom) + 40px)
+      calc(env(safe-area-inset-left) + 16px);
+  }
+  [hidden] { display: none !important; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+
+  header { margin-bottom: 20px; }
+  h1 { font-weight: 400; font-size: 42px; line-height: 1; margin: 0; }
+  .squiggle { display: block; width: 190px; height: 14px; margin-top: 2px; color: var(--red); }
+  .sub { color: var(--ink-soft); margin: 10px 0 0; }
+
+  form { display: flex; gap: 10px; }
+  .field { position: relative; flex: 1; min-width: 0; }
+  input {
+    font: inherit;
+    font-size: 22px;
+    width: 100%;
+    padding: 12px 46px 12px 16px;
+    border: 2px solid var(--ink);
+    border-radius: var(--sketch);
+    background: var(--card);
+    color: var(--ink);
+    outline: none;
+  }
+  input:focus { border-color: var(--pen); box-shadow: 0 0 0 3px rgb(38 72 199 / 0.15); }
+  .clear {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border: 0; background: none;
+    font-size: 28px; line-height: 1; color: var(--ink-soft);
+  }
+  .primary, .secondary {
+    font-size: 22px;
+    padding: 12px 20px;
+    border: 2px solid var(--ink);
+    border-radius: var(--sketch-alt);
+    box-shadow: 3px 3px 0 var(--ink);
+    white-space: nowrap;
+  }
+  .primary { background: var(--pen); color: #fff; }
+  .secondary { background: var(--card); }
+  .primary:active, .secondary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+
+  .examples { margin-top: 18px; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .examples button {
+    border: 1.5px dashed var(--ink-soft); background: var(--card);
+    border-radius: 999px; padding: 4px 14px; font-size: 19px; color: var(--ink);
+  }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 26px 0 0; }
+  figure { margin: 0; min-width: 0; }
+  .tile {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; aspect-ratio: 1; padding: 6px; overflow: hidden;
+    border: 2px solid var(--ink); border-radius: var(--sketch);
+    background: var(--card); color: var(--ink-soft);
+    font-size: 16px; text-align: center;
+  }
+  figure:nth-child(2) .tile { border-radius: var(--sketch-alt); }
+  .tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .tile[data-state="error"] { color: var(--red); }
+  .tile .msg { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+  figcaption { text-align: center; margin-top: 6px; font-size: 19px; }
+
+  .pencil { width: 34px; height: 34px; color: var(--pen); animation: wiggle 0.9s ease-in-out infinite; }
+  @keyframes wiggle {
+    0%, 100% { transform: translate(-6px, 2px) rotate(-8deg); }
+    50% { transform: translate(6px, -2px) rotate(8deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { .pencil { animation: none; } }
+
+  .actions { display: flex; justify-content: center; margin-top: 24px; }
+  .hint { text-align: center; color: var(--ink-soft); margin-top: 12px; font-size: 17px; }
+
+  .gate { max-width: 360px; margin: 12vh auto 0; text-align: center; }
+  .gate form { flex-direction: column; margin-top: 20px; }
+  .gate input { padding-right: 16px; text-align: center; }
+  .gate .error { color: var(--red); min-height: 26px; margin: 10px 0 0; }
+
+  .viewer {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px);
+    background: #fff;
+  }
+  .viewer img { width: 100%; max-width: 900px; flex: 1; min-height: 0; object-fit: contain; }
+  .viewer p { color: var(--ink-soft); margin: 8px 0 0; font-size: 18px; }
+
+  @media (max-width: 380px) {
+    h1 { font-size: 36px; }
+    .primary { padding: 12px 14px; }
+    .grid { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Dinner Doodle</h1>
+    <svg class="squiggle" viewBox="0 0 190 14" aria-hidden="true"><path d="M3 9c18-8 30 6 48-1s30-7 46 0 30 6 48-1 28-6 42 1" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+  </header>
+
+  <section class="gate" id="gate" hidden>
+    <p class="sub">What's the secret word?</p>
+    <form id="gate-form">
+      <input id="gate-input" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Passcode">
+      <button class="primary" type="submit">Let's draw</button>
+    </form>
+    <p class="error" id="gate-error" role="alert"></p>
+  </section>
+
+  <section id="app" hidden>
+    <form id="ask">
+      <div class="field">
+        <input id="word" type="text" placeholder="What do you need to draw?" maxlength="60" enterkeyhint="go" autocomplete="off" autocorrect="on" aria-label="What do you need to draw?">
+        <button class="clear" id="clear" type="button" aria-label="Clear" hidden>&times;</button>
+      </div>
+      <button class="primary" type="submit">Draw</button>
+    </form>
+
+    <div class="examples" id="examples">
+      Try:
+      <button type="button">hunter</button>
+      <button type="button">octopus</button>
+      <button type="button">lumberjack</button>
+      <button type="button">cat on a rocket</button>
+    </div>
+
+    <div id="results" hidden>
+      <div class="grid" id="grid"></div>
+      <div class="actions"><button class="secondary" id="again" type="button">New ones</button></div>
+      <p class="hint">Tap a doodle to see it big.</p>
+    </div>
+  </section>
+</main>
+
+<div class="viewer" id="viewer" hidden>
+  <img id="viewer-img" alt="">
+  <p>Tap anywhere to close</p>
+</div>
+
+<script>
+  const LEVELS = [
+    { level: 1, label: "Easiest" },
+    { level: 2, label: "Easy" },
+    { level: 3, label: "Fun" },
+  ];
+  const PENCIL = '<svg class="pencil" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M44 8l12 12-32 32H12V40z"/><path d="M38 14l12 12"/></g></svg>';
+
+  const $ = (id) => document.getElementById(id);
+  const gate = $("gate"), app = $("app"), grid = $("grid"), results = $("results");
+  const word = $("word"), clear = $("clear"), examples = $("examples");
+  const viewer = $("viewer"), viewerImg = $("viewer-img");
+
+  const saved = {
+    get() { try { return localStorage.getItem("passcode") || ""; } catch { return ""; } },
+    set(value) { try { localStorage.setItem("passcode", value); } catch {} },
+    clear() { try { localStorage.removeItem("passcode"); } catch {} },
+  };
+  let passcode = saved.get();
+  let currentWord = "";
+
+  // ---- Passcode gate ----
+  function showGate(message = "") {
+    passcode = "";
+    saved.clear();
+    app.hidden = true;
+    gate.hidden = false;
+    $("gate-error").textContent = message;
+    $("gate-input").select();
+  }
+  function showApp() {
+    gate.hidden = true;
+    app.hidden = false;
+  }
+  $("gate-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const value = $("gate-input").value.trim();
+    if (!value) return;
+    $("gate-error").textContent = "Checking…";
+    try {
+      const res = await fetch("/api/doodle", { headers: { "x-passcode": value } });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return showGate(res.status === 401 ? "Nope, that's not it." : data.error || "Something went wrong.");
+    } catch {
+      return showGate("Can't reach the server. Check your connection.");
+    }
+    passcode = value;
+    saved.set(value);
+    $("gate-input").value = "";
+    showApp();
+    if (currentWord) draw(currentWord);
+  });
+
+  // ---- Drawing ----
+  function draw(text) {
+    currentWord = text;
+    word.value = text;
+    clear.hidden = !text;
+    examples.hidden = true;
+    results.hidden = false;
+    grid.replaceChildren(...LEVELS.map(({ level, label }) => {
+      const figure = document.createElement("figure");
+      figure.innerHTML = `<button class="tile" type="button"></button><figcaption>${label}</figcaption>`;
+      const tile = figure.querySelector(".tile");
+      tile.addEventListener("click", () => {
+        if (tile.dataset.state === "done") openViewer(tile.querySelector("img"));
+        if (tile.dataset.state === "error") drawTile(tile, level, label, text);
+      });
+      drawTile(tile, level, label, text);
+      return figure;
+    }));
+  }
+
+  async function drawTile(tile, level, label, text) {
+    const run = {};
+    tile.run = run;
+    tile.dataset.state = "loading";
+    tile.innerHTML = `${PENCIL}<span>drawing…</span>`;
+    try {
+      const res = await fetch("/api/doodle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-passcode": passcode },
+        body: JSON.stringify({ subject: text, level }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (tile.run !== run) return;
+      if (res.status === 401) return showGate("The passcode changed. Type the new one.");
+      if (!res.ok) throw new Error(data.error || "Something went wrong.");
+      const img = new Image();
+      img.src = data.image;
+      img.alt = `${label} doodle of ${text}`;
+      tile.dataset.state = "done";
+      tile.replaceChildren(img);
+    } catch (err) {
+      if (tile.run !== run) return;
+      tile.dataset.state = "error";
+      tile.innerHTML = '<span class="msg"></span><span>tap to retry</span>';
+      tile.querySelector(".msg").textContent = err.message === "Failed to fetch" ? "No connection." : err.message;
+    }
+  }
+
+  $("ask").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const text = word.value.trim();
+    if (!text) return word.focus();
+    word.blur();
+    draw(text);
+  });
+  $("again").addEventListener("click", () => currentWord && draw(currentWord));
+  word.addEventListener("input", () => { clear.hidden = !word.value; });
+  clear.addEventListener("click", () => {
+    word.value = "";
+    clear.hidden = true;
+    word.focus();
+  });
+  examples.addEventListener("click", (event) => {
+    if (event.target.tagName === "BUTTON") draw(event.target.textContent);
+  });
+
+  // ---- Big view (keeps the screen awake while you copy) ----
+  let wakeLock = null;
+  async function openViewer(img) {
+    viewerImg.src = img.src;
+    viewerImg.alt = img.alt;
+    viewer.hidden = false;
+    try { wakeLock = await navigator.wakeLock?.request("screen"); } catch {}
+  }
+  function closeViewer() {
+    viewer.hidden = true;
+    wakeLock?.release().catch(() => {});
+    wakeLock = null;
+  }
+  viewer.addEventListener("click", closeViewer);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !viewer.hidden) closeViewer();
+  });
+
+  if (passcode) showApp(); else showGate();
+</script>
+</body>
+</html>
