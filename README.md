@@ -1,5 +1,7 @@
 # Dinner Doodle
 
+**Live:** https://dinner-doodle-ten.vercel.app
+
 Type a word ("hunter", "octopus", "someone sneezing") and get two simple black-pen doodles to copy on paper: **Easiest** and **Easy**. Made for doodle battles at the dinner table.
 
 - `index.html`: the whole app (no build step)
@@ -16,7 +18,7 @@ vercel dev
 
 ## Deploy
 
-1. Import this repo in Vercel (or run `vercel --prod`).
+1. Pushing to `main` deploys automatically (the repo is connected to Vercel). `vercel --prod` also works.
 2. Add the environment variables `OPENAI_API_KEY` and `DOODLE_PASSCODE`.
 3. On your phone, open the site in Safari → Share → **Add to Home Screen**.
 
