@@ -1,11 +1,11 @@
 # Dinner Doodle
 
-Type a word ("hunter", "octopus", "someone sneezing") and get three simple black-pen doodles to copy on paper: **Easiest**, **Easy** and **Fun**. Made for doodle battles at the dinner table.
+Type a word ("hunter", "octopus", "someone sneezing") and get two simple black-pen doodles to copy on paper: **Easiest** and **Easy**. Made for doodle battles at the dinner table.
 
 - `index.html`: the whole app (no build step)
 - `api/doodle.js`: Vercel function that asks OpenAI's image API for a doodle
 
-Each doodle is one low-quality `gpt-image-2` image (under 1¢), so a search of three costs about 2¢.
+Each doodle is one low-quality `gpt-image-2` image (under 1¢), so a search of two costs about 1¢.
 
 ## Run locally
 

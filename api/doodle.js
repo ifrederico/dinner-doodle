@@ -2,11 +2,10 @@ import { createHash, timingSafeEqual } from "node:crypto";
 
 const MODEL = process.env.OPENAI_IMAGE_MODEL || "gpt-image-2";
 
-// The three tiles go from easiest to most fun to copy.
+// Two tiles: the easiest possible, and one with a few more details.
 const STYLES = {
   1: "super simple doodle with as few lines as possible, something a child could copy in 30 seconds",
   2: "simple doodle with just a few details, like a quick napkin sketch anyone could copy in a minute",
-  3: "fun cartoon doodle with one or two playful details, still easy to copy with a pen in two minutes",
 };
 
 function buildPrompt(subject, level) {
@@ -52,7 +51,7 @@ export async function POST(request) {
   const subject = typeof body.subject === "string" ? body.subject.trim() : "";
   const level = Number(body.level);
   if (!subject || subject.length > 60) return json({ error: "Type 1 to 60 characters." }, 400);
-  if (!STYLES[level]) return json({ error: "Level must be 1, 2 or 3." }, 400);
+  if (!STYLES[level]) return json({ error: "Level must be 1 or 2." }, 400);
 
   let res, data;
   try {
